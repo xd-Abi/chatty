@@ -5,7 +5,8 @@
   "private": true,
   "packageManager": "yarn@1.22.19",
   "workspaces": [
-    "apis/*"
+    "apis/**",
+    "client/**"
   ],
   "scripts": {
     "dev": "turbo run dev"

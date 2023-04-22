@@ -1,5 +1,5 @@
 {
-  "name": "@chatty-api/auth",
+  "name": "@chatty/auth-api",
   "description": "A microservice which handles authentication and authorization",
   "version": "1.0.0",
   "private": true,

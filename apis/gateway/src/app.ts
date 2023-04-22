@@ -8,7 +8,7 @@ import { GatewayController } from './gateway/controller';
       {
         name: 'AUTH_SERVICE',
         transport: Transport.TCP,
-        options: { port: 3001 },
+        options: { port: 8081 },
       },
     ]),
   ],

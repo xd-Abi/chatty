@@ -1,5 +1,5 @@
 {
-  "name": "@chatty-api/gateway",
+  "name": "@chatty/gateway-api",
   "description": "The main gateway interface",
   "version": "1.0.0",
   "private": true,
