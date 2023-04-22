@@ -1,6 +1,7 @@
-import { Controller, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 import { LoginInterface, LogoutInterface, SignUpInterface } from './interfaces';
 import { UserService } from './services';
 
@@ -12,7 +13,11 @@ export class AuthController {
       throw new RpcException('Email already exists');
     }
 
-    const user = await this.userService.save(data);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const user = await this.userService.save({
+      ...data,
+      password: hashedPassword,
+    });
     const jwtPayload = { sub: user.id };
     const accessToken = await this.jwtService.signAsync(jwtPayload);
 
@@ -25,7 +30,10 @@ export class AuthController {
   async login(data: LoginInterface) {
     const user = await this.userService.findByEmail(data.email);
 
-    if (user === null || user.password !== data.password) {
+    if (
+      user === null ||
+      !(await bcrypt.compare(data.password, user.password))
+    ) {
       throw new RpcException('Invalid email or password');
     }
 
