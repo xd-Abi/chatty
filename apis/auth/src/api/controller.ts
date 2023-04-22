@@ -23,8 +23,18 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'login' })
   async login(data: LoginInterface) {
-    console.log(data);
-    return 'Hello, from Auth API';
+    const user = await this.userService.findByEmail(data.email);
+
+    if (user === null || user.password !== data.password) {
+      throw new RpcException('Invalid email or password');
+    }
+
+    const jwtPayload = { sub: user.id };
+    const accessToken = await this.jwtService.signAsync(jwtPayload);
+
+    return {
+      accessToken,
+    };
   }
 
   @MessagePattern({ cmd: 'logout' })

@@ -25,7 +25,7 @@ export class GatewayController {
   }
 
   @Post('auth/login')
-  async login(body: LoginInterface) {
+  async login(@Body() body: LoginInterface) {
     const pattern = { cmd: 'login' };
     const payload = body;
 
