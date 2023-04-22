@@ -21,3 +21,9 @@ export class LoginInterface {
   @IsNotEmpty()
   password: string;
 }
+
+export class RefreshTokenInterface {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
+}

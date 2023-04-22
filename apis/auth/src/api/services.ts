@@ -11,8 +11,8 @@ export class UserService {
     return await this.userRepository.findOneBy({ email });
   }
 
-  async save(user: Partial<User>) {
-    return await this.userRepository.save(user);
+  async findByRefreshToken(refreshToken: string) {
+    return await this.userRepository.findOneBy({ refreshToken });
   }
 
   async findHashedPasswordById(id: string) {
@@ -31,6 +31,10 @@ export class UserService {
     });
 
     return user.refreshToken;
+  }
+
+  async save(user: Partial<User>) {
+    return await this.userRepository.save(user);
   }
 
   constructor(

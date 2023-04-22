@@ -14,7 +14,6 @@ export interface LogoutInterface {
 }
 
 export interface RefreshTokenInterface {
-  userId: string;
   refreshToken: string;
 }
 

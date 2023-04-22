@@ -17,7 +17,7 @@ import { User } from './entities';
 export class AuthController {
   @MessagePattern({ cmd: 'signup' })
   async signup(data: SignUpInterface) {
-    if (await this.userService.findByEmail(data.email)) {
+    if (await this.userService.findByEmail(data.email ?? '')) {
       throw new RpcException(`User with email ${data.email} already exists`);
     }
 
@@ -41,9 +41,9 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'login' })
   async login(data: LoginInterface) {
-    const user = await this.userService.findByEmail(data.email);
+    const user = await this.userService.findByEmail(data.email ?? '');
 
-    if (!user) {
+    if (user === null) {
       throw new RpcException(`User with email ${data.email} does not exist`);
     }
 
@@ -67,21 +67,24 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'logout' })
   async logout(data: LogoutInterface) {
-    const user = await this.userService.findById(data.userId);
+    const user = await this.userService.findById(data.userId ?? '');
 
-    if (!user) {
+    if (user === null) {
       throw new RpcException(`User with id ${data.userId} does not exist`);
     }
 
     await this.userService.save({ ...user, refreshToken: null });
+    return 'Successfully logged out';
   }
 
   @MessagePattern({ cmd: 'refresh-token' })
   async refreshToken(data: RefreshTokenInterface) {
-    const user = await this.userService.findById(data.userId);
+    const user = await this.userService.findByRefreshToken(
+      data.refreshToken ?? '',
+    );
 
-    if (!user) {
-      throw new RpcException(`User with id ${data.userId} does not exist`);
+    if (user === null) {
+      throw new RpcException(`Invalid refresh token provided`);
     }
 
     const currentRefreshToken = await this.userService.findRefreshTokenById(
