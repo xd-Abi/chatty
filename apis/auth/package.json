@@ -1,6 +1,6 @@
 {
-  "name": "@chatty-api/gateway",
-  "description": "The main gateway interface",
+  "name": "@chatty-api/auth",
+  "description": "A microservice which handles authentication and authorization",
   "version": "1.0.0",
   "private": true,
   "scripts": {
