@@ -1,5 +1,5 @@
 {
-  "name": "chatty-api",
+  "name": "chatty",
   "description": "A realtime chat build with nest.js",
   "version": "1.0.0",
   "private": true,
