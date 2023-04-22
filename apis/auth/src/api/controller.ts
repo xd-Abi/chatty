@@ -1,28 +1,40 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
-import { LoginInterface, LogoutInterface, SignUpInterface } from './interfaces';
+import { compare as comparePasswords, hash } from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  LoginInterface,
+  LogoutInterface,
+  RefreshTokenInterface,
+  SignUpInterface,
+} from './interfaces';
 import { UserService } from './services';
+import { User } from './entities';
 
 @Controller()
 export class AuthController {
   @MessagePattern({ cmd: 'signup' })
   async signup(data: SignUpInterface) {
-    if ((await this.userService.findByEmail(data.email)) !== null) {
-      throw new RpcException('Email already exists');
+    if (await this.userService.findByEmail(data.email)) {
+      throw new RpcException(`User with email ${data.email} already exists`);
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await hash(data.password, 12);
     const user = await this.userService.save({
+      id: await uuidv4(),
       ...data,
       password: hashedPassword,
     });
-    const jwtPayload = { sub: user.id };
-    const accessToken = await this.jwtService.signAsync(jwtPayload);
+
+    const accessToken = await this.createAccessToken(user);
+    const refreshToken = await this.createRefreshToken();
+
+    await this.userService.save({ ...user, refreshToken });
 
     return {
       accessToken,
+      refreshToken,
     };
   }
 
@@ -30,24 +42,73 @@ export class AuthController {
   async login(data: LoginInterface) {
     const user = await this.userService.findByEmail(data.email);
 
-    if (
-      user === null ||
-      !(await bcrypt.compare(data.password, user.password))
-    ) {
-      throw new RpcException('Invalid email or password');
+    if (!user) {
+      throw new RpcException(`User with email ${data.email} does not exist`);
     }
 
-    const jwtPayload = { sub: user.id };
-    const accessToken = await this.jwtService.signAsync(jwtPayload);
+    const currentPassword = await this.userService.findHashedPasswordById(
+      user.id,
+    );
+    if (!(await comparePasswords(data.password, currentPassword))) {
+      throw new RpcException(`Invalid credentials provided`);
+    }
+
+    const accessToken = await this.createAccessToken(user);
+    const refreshToken = await this.createRefreshToken();
+
+    await this.userService.save({ ...user, refreshToken });
 
     return {
       accessToken,
+      refreshToken,
     };
   }
 
   @MessagePattern({ cmd: 'logout' })
   async logout(data: LogoutInterface) {
-    return 'Hello, from Auth API';
+    const user = await this.userService.findById(data.userId);
+
+    if (!user) {
+      throw new RpcException(`User with id ${data.userId} does not exist`);
+    }
+
+    await this.userService.save({ ...user, refreshToken: null });
+  }
+
+  @MessagePattern({ cmd: 'refresh-token' })
+  async refreshToken(data: RefreshTokenInterface) {
+    const user = await this.userService.findById(data.userId);
+
+    if (!user) {
+      throw new RpcException(`User with id ${data.userId} does not exist`);
+    }
+
+    const currentRefreshToken = await this.userService.findRefreshTokenById(
+      user.id,
+    );
+
+    if (currentRefreshToken !== data.refreshToken) {
+      throw new RpcException('Invalid refresh token provided');
+    }
+
+    const accessToken = await this.createAccessToken(user);
+    const refreshToken = await this.createRefreshToken();
+
+    await this.userService.save({ ...user, refreshToken });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async createAccessToken(user: User) {
+    const jwtPayload = { sub: user.id };
+    return await this.jwtService.signAsync(jwtPayload);
+  }
+
+  async createRefreshToken() {
+    return await hash(Math.random().toString(), 12);
   }
 
   constructor(

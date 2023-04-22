@@ -1,5 +1,5 @@
 export interface SignUpInterface {
-  fullName: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -9,4 +9,11 @@ export interface LoginInterface {
   password: string;
 }
 
-export interface LogoutInterface {}
+export interface LogoutInterface {
+  userId: string;
+}
+
+export interface RefreshTokenInterface {
+  userId: string;
+  refreshToken: string;
+}
