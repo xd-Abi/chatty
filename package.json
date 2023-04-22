@@ -1,0 +1,17 @@
+{
+  "name": "chatty-api",
+  "description": "A realtime chat build with nest.js",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "yarn@1.22.19",
+  "workspaces": [
+    "apis/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev"
+  },
+  "dependencies": {
+    "prettier": "latest",
+    "turbo": "latest"
+  }
+}
