@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, IsEmail, MinLength } from 'class-validator';
 export class SignUpInterface {
   @IsString()
   @IsNotEmpty()
-  username: string;
+  fullName: string;
 
   @IsEmail()
   email: string;

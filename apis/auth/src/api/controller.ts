@@ -1,13 +1,24 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { Controller, HttpException, HttpStatus } from '@nestjs/common';
+import { MessagePattern, RpcException } from '@nestjs/microservices';
+import { JwtService } from '@nestjs/jwt';
 import { LoginInterface, LogoutInterface, SignUpInterface } from './interfaces';
+import { UserService } from './services';
 
 @Controller()
 export class AuthController {
   @MessagePattern({ cmd: 'signup' })
   async signup(data: SignUpInterface) {
-    console.log(data);
-    return 'Hello, from Auth API';
+    if ((await this.userService.findByEmail(data.email)) !== null) {
+      throw new RpcException('Email already exists');
+    }
+
+    const user = await this.userService.save(data);
+    const jwtPayload = { sub: user.id };
+    const accessToken = await this.jwtService.signAsync(jwtPayload);
+
+    return {
+      accessToken,
+    };
   }
 
   @MessagePattern({ cmd: 'login' })
@@ -20,4 +31,9 @@ export class AuthController {
   async logout(data: LogoutInterface) {
     return 'Hello, from Auth API';
   }
+
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 }
