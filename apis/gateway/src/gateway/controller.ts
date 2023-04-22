@@ -5,10 +5,12 @@ import {
   Body,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { LoginInterface, SignUpInterface } from './interfaces';
+import { AuthGuard } from './guard';
 
 @Controller()
 export class GatewayController {
@@ -36,11 +38,12 @@ export class GatewayController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Post('auth/logout')
   async logout() {
-    const pattern = { cmd: 'signup' };
-    const payload = {};
-    return this.authService.send(pattern, payload);
+    // const pattern = { cmd: 'signup' };
+    // const payload = {};
+    // return this.authService.send(pattern, payload);
   }
 
   constructor(@Inject('AUTH_SERVICE') private authService: ClientProxy) {}

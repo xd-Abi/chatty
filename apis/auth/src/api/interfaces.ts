@@ -17,3 +17,7 @@ export interface RefreshTokenInterface {
   userId: string;
   refreshToken: string;
 }
+
+export interface VerifyTokenInterface {
+  accessToken: string;
+}

@@ -8,6 +8,7 @@ import {
   LogoutInterface,
   RefreshTokenInterface,
   SignUpInterface,
+  VerifyTokenInterface,
 } from './interfaces';
 import { UserService } from './services';
 import { User } from './entities';
@@ -100,6 +101,17 @@ export class AuthController {
       accessToken,
       refreshToken,
     };
+  }
+
+  @MessagePattern({ cmd: 'verify-token' })
+  async verifyToken(data: VerifyTokenInterface) {
+    try {
+      if (await this.jwtService.verify(data.accessToken)) {
+        return true;
+      }
+    } catch (error) {}
+
+    return false;
   }
 
   async createAccessToken(user: User) {
