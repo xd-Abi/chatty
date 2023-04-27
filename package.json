@@ -1,18 +1,20 @@
 {
   "name": "chatty",
-  "description": "A realtime chat build with nest.js",
   "version": "1.0.0",
   "private": true,
   "packageManager": "yarn@1.22.19",
   "workspaces": [
-    "apis/**",
-    "client/**"
+    "apis/*",
+    "packages/*",
+    "packages/apis/*"
   ],
   "scripts": {
-    "dev": "turbo run dev"
+    "build": "turbo run build",
+    "dev": "yarn build && dotenv -- turbo run dev"
   },
-  "dependencies": {
+  "devDependencies": {
     "prettier": "latest",
-    "turbo": "latest"
+    "turbo": "latest",
+    "dotenv-cli": "latest"
   }
 }

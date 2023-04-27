@@ -1,0 +1,19 @@
+{
+  "name": "@chatty/common",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts"
+  },
+  "devDependencies": {
+    "tsup": "^5.10.1",
+    "typescript": "^4.5.3"
+  }
+}
