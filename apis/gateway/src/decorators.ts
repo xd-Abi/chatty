@@ -1,18 +1,32 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
+import axios from 'axios';
 
 export const JwtSubject = createParamDecorator(
-  (data: unknown, context: ExecutionContext) => {
+  async (data: unknown, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
     if (!authHeader) {
       return null;
     }
-    const token = authHeader.replace('Bearer ', '');
-    const decoded: any = jwt.decode(token);
-    if (!decoded) {
-      return null;
+
+    try {
+      const result = await axios.get(
+        `https://${process.env.AUTH0_DOMAIN}/userinfo`,
+        {
+          headers: {
+            Authorization: `${authHeader}`,
+          },
+        },
+      );
+
+      const rawSub = result.data.sub;
+      const sub = rawSub.substring(rawSub.indexOf('|') + 1);
+
+      return sub;
+    } catch (error) {
+      console.error(error);
     }
-    return decoded.sub;
+
+    return null;
   },
 );

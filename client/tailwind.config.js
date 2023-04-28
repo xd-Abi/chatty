@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       colors: {
         accent: '#F3F6F9',
+        primary: '#007FFF',
       },
       borderColor: {
         vivid: '#E0E3E7',

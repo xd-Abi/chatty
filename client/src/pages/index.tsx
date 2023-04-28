@@ -1,18 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  withPageAuthRequired,
-  getAccessToken,
-  getSession,
-} from '@auth0/nextjs-auth0';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import React, { useRef, useState } from 'react';
+import { withPageAuthRequired, getAccessToken } from '@auth0/nextjs-auth0';
 import { Roboto } from 'next/font/google';
 import { Dialog, Transition } from '@headlessui/react';
 import {
+  Cog6ToothIcon,
   ExclamationTriangleIcon,
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
+import { RequestHandler } from '@/lib/requesthandler';
+import { User } from '@/lib/models';
 import SettingsDropdown from '@/components/settings-dropdown';
-import axios from 'axios';
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -109,8 +106,13 @@ function FriendRequestModal() {
   );
 }
 
-export default function Home(props: { user: any; accessToken: any }) {
-  const { user } = useUser();
+interface Props {
+  me: User;
+}
+
+export default function Home(props: Props) {
+  const { me } = props;
+  const [searchText, setSearchText] = useState('');
 
   return (
     <React.Fragment>
@@ -119,10 +121,10 @@ export default function Home(props: { user: any; accessToken: any }) {
           <div className="h-20 border-b p-3 flex items-center border-vivid">
             <img
               className="w-14 h-14 rounded-full border border-vivid"
-              src={user?.picture ?? '/images/placeholder-profile.jpg'}
+              src={me?.avatar ?? '/images/placeholder-profile.jpg'}
             />
             <div>
-              <p className="text-sm ml-2 text-vivid font-bold">{user?.name}</p>
+              <p className="text-sm ml-2 text-vivid font-bold">{me?.name}</p>
               <p className="text-sm ml-2 text-dim font-normal">Hey there! 👋</p>
             </div>
             <div className="flex flex-1 justify-end">
@@ -137,7 +139,9 @@ export default function Home(props: { user: any; accessToken: any }) {
             />
             <input
               className="focus:outline-none flex flex-1 ml-2 bg-transparent text-dim"
-              placeholder="Search"
+              placeholder="Search or Add friends"
+              onChange={(e) => setSearchText(e.target.value)}
+              value={searchText}
             />
           </div>
           <div className="mt-5"></div>
@@ -157,49 +161,12 @@ export default function Home(props: { user: any; accessToken: any }) {
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps({ req, res }) {
     const accessToken = await getAccessToken(req, res);
-    const session = await getSession(req, res);
-
-    console.log(accessToken);
-    const result = await axios.get(`${process.env.BACKEND_URL}/api/me`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    console.log(result);
-
-    // console.log(accessToken);
-    // console.log(session);
-
-    // if (session && session.user) {
-    //   const user = session.user;
-    //   axios
-    //     .post(
-    //       `${process.env.BACKEND_URL}/api/auth/register`,
-    //       {
-    //         name: user.name,
-    //         email: user.email,
-    //         avatar: user.picture,
-    //       },
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${accessToken}`,
-    //         },
-    //       },
-    //     )
-    //     .then((result) => {
-    //       console.log(result);
-    //     })
-    //     .catch((err) => {
-    //       console.error(err);
-    //     });
-    // }
-
+    const requestHandler = new RequestHandler(accessToken?.accessToken ?? '');
+    const me = await requestHandler.get<User>('api/me');
     return {
       props: {
-        user: session?.user,
-        accessToken,
-      },
+        me,
+      } as Props,
     };
   },
 });

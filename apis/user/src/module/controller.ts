@@ -9,6 +9,13 @@ import { GetUserInterface, RegisterInterface } from './interfaces';
 export class UserController {
   @MessagePattern({ cmd: 'register' })
   async register(data: RegisterInterface) {
+    console.log(data);
+    const user = await this.getUser({ uid: data.uid });
+
+    if (user) {
+      return user;
+    }
+
     return await this.repository.save(data);
   }
 

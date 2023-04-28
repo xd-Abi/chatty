@@ -1,54 +1,33 @@
-import {
-  handleAuth,
-  handleCallback,
-  Session,
-  getAccessToken,
-  LoginOptions,
-  handleLogin,
-} from '@auth0/nextjs-auth0';
-import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { handleAuth, handleCallback, Session } from '@auth0/nextjs-auth0';
+import axios from 'axios';
+import { RequestHandler } from '@/lib/requesthandler';
 
-// function afterCallback(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: Session,
-//   state: any,
-// ): Session {
-//   console.log(session);
-//   console.log(process.env.API_URL);
+function afterCallback(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: Session,
+  state: any,
+): Session {
+  if (session.user) {
+    const user = session.user;
+    const requestHandler = new RequestHandler(session?.accessToken ?? '');
+    requestHandler.post(`api/auth/register`, {
+      name: user.name,
+      email: user.email,
+      avatar: user.picture,
+    });
+  }
 
-//   if (session.user) {
-//     const user = session.user;
+  return session;
+}
 
-//     const sendRequest = async () => {
-//       const { accessToken } = await getAccessToken(req, res);
-//       axios
-//         .post(
-//           `${process.env.API_URL}/api/auth/register`,
-//           {
-//             name: user.name,
-//             email: user.email,
-//             avatar: user.picture,
-//           },
-//           {
-//             headers: {
-//               Authorization: `Bearer ${accessToken}`,
-//             },
-//           },
-//         )
-//         .then((result) => {
-//           console.log(result);
-//         })
-//         .catch((err) => {
-//           console.error(err);
-//         });
-//     };
-
-//     sendRequest();
-//   }
-
-//   return session;
-// }
-
-export default handleAuth({});
+export default handleAuth({
+  async callback(req: NextApiRequest, res: NextApiResponse) {
+    try {
+      await handleCallback(req, res, { afterCallback });
+    } catch (error) {
+      res.status(500).end();
+    }
+  },
+});

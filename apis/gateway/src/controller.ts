@@ -36,13 +36,11 @@ export class GatewayController {
       uid,
     };
 
-    return 'hello';
-
-    // return await this.authService.send(pattern, payload).pipe(
-    //   catchError((error) => {
-    //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    //   }),
-    // );
+    return await this.authService.send(pattern, payload).pipe(
+      catchError((error) => {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }),
+    );
   }
 
   constructor(@Inject('AUTH_SERVICE') private authService: ClientProxy) {}
