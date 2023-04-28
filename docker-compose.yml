@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  user-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user-api
+      POSTGRES_PASSWORD: uZdJ8y92!lwL
+      POSTGRES_DB: user
+    ports:
+      - '5432:5432'

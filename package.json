@@ -4,17 +4,15 @@
   "private": true,
   "packageManager": "yarn@1.22.19",
   "workspaces": [
-    "apps/*",
-    "packages/*",
-    "packages/apis/*"
+    "apis/*",
+    "client"
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "yarn build && dotenv -- turbo run dev"
+    "dev": "yarn build && turbo run dev"
   },
   "devDependencies": {
     "prettier": "latest",
-    "turbo": "latest",
-    "dotenv-cli": "latest"
+    "turbo": "latest"
   }
 }
