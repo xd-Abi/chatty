@@ -13,10 +13,10 @@ import { GatewayController } from './controller';
         },
       },
       {
-        name: 'AUTH_SERVICE',
+        name: 'FRIEND_SERVICE',
         transport: Transport.TCP,
         options: {
-          port: (process.env.USER_SERVICE_PORT ?? 0) as number,
+          port: (process.env.FRIEND_SERVICE_PORT ?? 0) as number,
         },
       },
     ]),

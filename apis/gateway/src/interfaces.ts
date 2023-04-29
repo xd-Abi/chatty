@@ -12,3 +12,9 @@ export class RegisterInterface {
   @IsNotEmpty()
   avatar: string;
 }
+
+export class AddFriendInterface {
+  @IsString()
+  @IsNotEmpty()
+  recipient: string;
+}
