@@ -12,6 +12,13 @@ import { GatewayController } from './controller';
           port: (process.env.USER_SERVICE_PORT ?? 0) as number,
         },
       },
+      {
+        name: 'AUTH_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          port: (process.env.USER_SERVICE_PORT ?? 0) as number,
+        },
+      },
     ]),
   ],
   controllers: [GatewayController],

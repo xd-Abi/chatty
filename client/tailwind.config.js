@@ -7,20 +7,17 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        accent: '#F3F6F9',
-        primary: '#007FFF',
+      backgroundColor: {
+        vivid: '#FFFFFF',
+        dim: '#FAFBFD',
       },
-      borderColor: {
-        vivid: '#E0E3E7',
+      colors: {
+        primary: '#0577FD',
+        secondary: '#084FA3',
       },
       textColor: {
-        vivid: '#0A1929',
-        dim: '#3E5060',
-      },
-      stroke: {
-        vivid: '#0A1929',
-        dim: '#3E5060',
+        vivid: '#000000',
+        dim: '#ACADAF',
       },
     },
   },

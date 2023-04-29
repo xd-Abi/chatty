@@ -10,3 +10,13 @@ services:
       POSTGRES_DB: user
     ports:
       - '5432:5432'
+
+  friends-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: friends-api
+      POSTGRES_PASSWORD: 5w6ViyM29A72
+      POSTGRES_DB: friends
+    ports:
+      - '5433:5432'
